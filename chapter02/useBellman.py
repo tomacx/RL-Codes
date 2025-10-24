@@ -8,6 +8,7 @@ q_hungry_eat, q_hungry_none, q_full_eat, q_full_none = \
 alpha, beta, gamma = symbols('alpha beta gamma')
 x, y = symbols('x y')
 
+# Bellman期望方程解
 system = sympy.Matrix((
         (1, 0, x-1, -x, 0, 0, 0),
         (0, 1, 0, 0, -y, y-1, 0),
@@ -21,6 +22,7 @@ result = sympy.solve_linear_system(system,
                           )
 print(result)
 
+# Bellman最优方程解
 xy_tuples = ((0, 0), (1, 0), (0, 1), (1, 1))
 for x, y in xy_tuples:
     system = sympy.Matrix((
