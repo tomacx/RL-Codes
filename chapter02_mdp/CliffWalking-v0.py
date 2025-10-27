@@ -27,8 +27,11 @@ def play_once(env, policy):
 
 actions = np.ones(env.shape, dtype=int)
 actions[-1, :] = 0
+# print(actions)
 actions[:, -1] = 2
+# print(actions)
 optimal_policy = np.eye(4)[actions.reshape(-1)]
+# print(optimal_policy)
 
 total_reward = play_once(env, optimal_policy)
 print('回合奖励 = {}'.format(total_reward))
@@ -72,10 +75,10 @@ def optimal_bellman(env, gamma=1.):
         for action in range(env.nA):
             for prob, next_state, reward, terminated in env.P[state][action]:
                 p[state, action, next_state] += prob
-                r[state, action] += (reward * prob)
-    c = np.ones(env.nS)
+                r[state, action] += (reward * prob) # 计算期望奖励
+    c = np.ones(env.nS) # 线性规划定义目标函数
     a_ub = gamma * p.reshape(-1, env.nS) - \
-            np.repeat(np.eye(env.nS), env.nA, axis=0)
+            np.repeat(np.eye(env.nS), env.nA, axis=0) # γ
     b_ub = -r.reshape(-1)
     a_eq = np.zeros((0, env.nS))
     b_eq = np.zeros(0)
