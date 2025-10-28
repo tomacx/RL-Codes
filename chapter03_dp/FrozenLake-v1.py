@@ -119,10 +119,10 @@ def iterate_value(env, gamma=1., tolerant=1e-6):
             vmax = max(v2q(env, v, s, gamma)) # 更新价值函数
             delta = max(delta, abs(v[s] - vmax))
             v[s] = vmax
-        if delta < tolerant:
+        if delta < tolerant:    # 满足迭代要求
             break
 
-    policy = np.zeros((env.observation_space.n, env.action_space.n))
+    policy = np.zeros((env.observation_space.n, env.action_space.n))    # 计算最优策略
     for s in range(env.observation_space.n):
         a = np.argmax(v2q(env, v, s,gamma))
         policy[s][a] = 1.
