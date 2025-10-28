@@ -115,7 +115,7 @@ def iterate_value(env, gamma=1., tolerant=1e-6):
     v = np.zeros(env.observation_space.n) # 初始化
     while True:
         delta = 0
-        for s in range(env.observation_space.n):
+        for s in range(env.observation_space.n):    # 异步动态规划
             vmax = max(v2q(env, v, s, gamma)) # 更新价值函数
             delta = max(delta, abs(v[s] - vmax))
             v[s] = vmax
