@@ -95,3 +95,5 @@ print('最优动作价值 = {}'.format(optimal_action_values))
 
 optimal_actions = optimal_action_values.argmax(axis=1)
 print('最优策略 = {}'.format(optimal_actions))
+
+env.close()

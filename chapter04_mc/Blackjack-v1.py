@@ -247,3 +247,5 @@ plot(v)
 
 plt.show()
 
+env.close()
+

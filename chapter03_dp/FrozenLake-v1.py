@@ -133,3 +133,5 @@ print("状态价值函数：")
 print(v_vi.reshape(4,4))
 print("最优策略为 =")
 print(np.argmax(policy_vi, axis=1).reshape(4,4))
+
+env.close()

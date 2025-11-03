@@ -395,3 +395,5 @@ agent.epsilon = 0. # 取消探索
 episode_rewards = [play_qlearning(env, agent) for _ in range(100)]
 print('平均回合奖励 = {} / {} = {}'.format(sum(episode_rewards),
         len(episode_rewards), np.mean(episode_rewards)))
+
+env.close()

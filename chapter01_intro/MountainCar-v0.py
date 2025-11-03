@@ -78,3 +78,5 @@ env.close()
 
 # episode_rewards = [play_montecarlo(env, agent) for _ in range(100)]
 # print('平均回合奖励 = {}'.format(np.mean(episode_rewards)))
+
+env.close()
