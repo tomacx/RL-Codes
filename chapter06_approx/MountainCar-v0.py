@@ -346,6 +346,44 @@ agent = DQNAgent(env, net_kwargs=net_kwargs)
 # 训练
 episodes = 500
 episode_rewards = []
+# chart = Chart()
+for episode in range(episodes):
+    print(f"第 {episode + 1}/{episodes} 轮，奖励：{episode_reward}")
+    episode_reward = play_qlearning(env, agent, train=True)
+    episode_rewards.append(episode_reward)
+    # chart.plot(episode_rewards)
+
+# 测试
+agent.epsilon = 0. # 取消探索
+episode_rewards = [play_qlearning(env, agent) for _ in range(100)]
+print('平均回合奖励 = {} / {} = {}'.format(sum(episode_rewards),
+        len(episode_rewards), np.mean(episode_rewards)))
+
+# 双重DQN
+class DoubleDQNAgent(DQNAgent):
+    def learn(self, observation, action, reward, next_observation, terminated, truncated):
+        self.replaye.store(observation, action, reward, next_observation,
+                           terminated) # 存储经验
+        observations, actions, rewards, next_observations, terminateds = \
+            self.replayer.sample(self.batch_size)  # 经验回放
+        next_eval_qs = self.evaluate_net.predict(next_observations, verbose=0)
+        next_actions = next_eval_qs.argmax(axis=-1)
+        next_qs = self.target_net.predict(next_observations, verbose=0)
+        next_max_qs = next_qs[np.arange(next_qs.shape[0]), next_actions]
+        us = rewards + self.gamma * next_max_qs * (1. - terminateds) # 换成用评估网络来更新价值
+        targets = self.evaluate_net.predict(observations, verbose=0)
+        targets[np.arange(us.shape[0]), actions] = us
+        self.evaluate_net.fit(observations, targets, verbose=0)
+
+        if terminated or truncated:
+            self.target_net.set_weights(self.evaluate_net.get_weights())
+
+net_kwargs = {'hidden_sizes' : [64, 64], 'learning_rate' : 0.001}
+agent = DoubleDQNAgent(env, net_kwargs=net_kwargs)
+
+# 训练
+episodes = 500
+episode_rewards = []
 chart = Chart()
 for episode in range(episodes):
     episode_reward = play_qlearning(env, agent, train=True)

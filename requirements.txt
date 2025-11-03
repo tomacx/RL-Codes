@@ -48,9 +48,7 @@ tensorboard==2.8.0
 tensorboard-data-server==0.6.1
 tensorboard-plugin-wit==1.8.1
 tensorflow-estimator==2.4.0
-tensorflow-io-gcs-filesystem==0.34.0
 termcolor==1.1.0
-tf-estimator-nightly==2.8.0.dev2021122109
 typing-extensions==3.7.4.3
 tzdata==2025.2
 urllib3==2.2.3
