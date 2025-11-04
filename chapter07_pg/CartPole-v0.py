@@ -51,6 +51,7 @@ class VPGAgent:
         return model
 
     def decide(self, observation):
+        # 网络返回的是 动作的概率分布
         probs = self.policy_net.predict(observation[np.newaxis], verbose=0)[0]
         action = np.random.choice(self.action_n, p=probs)
         return action
@@ -61,21 +62,21 @@ class VPGAgent:
         if terminated or truncated:
             df = pd.DataFrame(self.trajectory,
                               columns=['observation', 'action', 'reward'])
-            df['discount'] = self.gamma ** df.index.to_series()
-            df['discounted_reward'] = df['discount'] * df['reward']
-            df['discounted_return'] = df['discounted_reward'][::-1].cumsum()
-            df['psi'] = df['discounted_return']
+            df['discount'] = self.gamma ** df.index.to_series() # df.index.to_series()获取第几步
+            df['discounted_reward'] = df['discount'] * df['reward'] # 折扣奖励
+            df['discounted_return'] = df['discounted_reward'][::-1].cumsum()   # 倒序操作，累计求和
+            df['psi'] = df['discounted_return'] # 样本权重
 
             x = np.stack(df['observation'])
             if hasattr(self, 'baseline_net'):
                 df['baseline'] = self.baseline_net.predict(x, verbose=0)
-                df['psi'] -= (df['baseline'] * df['discount'])
+                df['psi'] -= (df['baseline'] * df['discount']) # 用基线来进行修正
                 df['return'] = df['discounted_return'] / df['discount']
                 y = df['return'].values[:, np.newaxis]
                 self.baseline_net.fit(x, y, verbose=0)
 
             sample_weight = df['psi'].values[:, np.newaxis]
-            y = np.eye(self.action_n)[df['action']]
+            y = np.eye(self.action_n)[df['action']]  # 离散动作变成独热编码
             self.policy_net.fit(x, y, sample_weight=sample_weight, verbose=0)
 
             self.trajectory = [] # 下一回合初始化经验列表
@@ -134,6 +135,8 @@ for episode in range(episodes):
     episode_rewards.append(episode_reward)
     chart.plot(episode_rewards)
 
+plt.show()
+
 # 测试
 episode_rewards = [play_montecarlo(env, agent, train=False) \
                    for _ in range(100)]
@@ -159,7 +162,7 @@ class OffPolicyVPGAgent(VPGAgent):
 
         self.trajectory = []
 
-        def dot(y_true, y_pred):
+        def dot(y_true, y_pred): # 点积损失函数
             return -tf.reduce_sum(y_true * y_pred, axis=-1)
 
         self.policy_net = self.build_network(output_size=self.action_n,
@@ -188,9 +191,9 @@ class OffPolicyVPGAgent(VPGAgent):
                 y = df['return'].values[:, np.newaxis]
                 self.baseline_net.fit(x, y, verbose=0)
 
-            sample_weight = (df['psi'] / df['behavior']).values[:, np.newaxis]
+            sample_weight = (df['psi'] / df['behavior']).values[:, np.newaxis] # 分子的Π(a_t | s_t) 已经在损失函数当中了
             y = np.eye(self.action_n)[df['action']]
-            self.policy_net.fit(x, y, sample_weight=sample_weight, verbose=0)
+            self.policy_net.fit(x, y, sample_weight=sample_weight, verbose=0) # sample_weights是加权到损失函数上
 
             self.trajectory = [] # 为下一回合初始化经验列表
 
@@ -219,6 +222,8 @@ for episode in range(episodes):
     episode_reward = play_montecarlo(env, agent, train=False)
     episode_rewards.append(episode_reward)
     chart.plot(episode_rewards)
+
+plt.show()
 
 # 测试
 episode_rewards = [play_montecarlo(env, agent, train=False)
@@ -253,6 +258,8 @@ for episode in range(episodes):
     episode_reward = play_montecarlo(env, agent, train=False)
     episode_rewards.append(episode_reward)
     chart.plot(episode_rewards)
+
+plt.show()
 
 # 测试
 episode_rewards = [play_montecarlo(env, agent, train=False)

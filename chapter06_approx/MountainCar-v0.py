@@ -252,6 +252,7 @@ class Chart:
 # 经验回放 补充：代码和原理
 class DQNReplayer:
     def __init__(self, capacity):
+        # 创建5列存储经验，0~capacity-1 一行一个经验
         self.memory = pd.DataFrame(index=range(capacity),
                                    columns=['observation', 'action', 'reward', 'next_observation', 'terminated'])
         self.i = 0
@@ -259,12 +260,16 @@ class DQNReplayer:
         self.capacity = capacity
 
     def store(self, *args):
+        # np.asarray是把args存入导memory当中，object是让args转换成的数据类型
         self.memory.loc[self.i] = np.asarray(args, dtype=object)
+        # 循环队列
         self.i = (self.i + 1) % self.capacity
         self.count = min(self.count + 1, self.capacity)
 
     def sample(self, size):
+        # 随机选择 size大小的
         indices = np.random.choice(self.count, size)
+        # 按顺序返回5个不同的数组
         return (np.stack(self.memory.loc[indices, field]) for field in
                 self.memory.columns)
 
@@ -310,6 +315,7 @@ class DQNAgent:
         next_max_qs = next_qs.max(axis=-1)
         us = rewards + self.gamma * (1. - terminateds) * next_max_qs
         targets = self.evalute_net.predict(observations, verbose=0)
+        # 覆盖当前的动作，剩下的动作保持原始状态
         targets[np.arange(us.shape[0]), actions] = us
         self.evalute_net.fit(observations, targets, verbose=0)
 
@@ -346,12 +352,14 @@ agent = DQNAgent(env, net_kwargs=net_kwargs)
 # 训练
 episodes = 500
 episode_rewards = []
-# chart = Chart()
+chart = Chart()
 for episode in range(episodes):
     print(f"第 {episode + 1}/{episodes} 轮，奖励：{episode_reward}")
     episode_reward = play_qlearning(env, agent, train=True)
     episode_rewards.append(episode_reward)
-    # chart.plot(episode_rewards)
+    chart.plot(episode_rewards)
+
+plt.show()
 
 # 测试
 agent.epsilon = 0. # 取消探索
@@ -389,6 +397,8 @@ for episode in range(episodes):
     episode_reward = play_qlearning(env, agent, train=True)
     episode_rewards.append(episode_reward)
     chart.plot(episode_rewards)
+
+plt.show()
 
 # 测试
 agent.epsilon = 0. # 取消探索
