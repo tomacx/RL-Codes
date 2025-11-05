@@ -97,61 +97,61 @@ def play_montecarlo(env, agent, render=False, train=False):
         observation = next_observation
     return episode_reward
 
-# 不带基线的简单策略梯度算法
-print('简单策略梯度算法')
-policy_kwargs = {'hidden_sizes': [], 'learning_rate': 0.005}
-agent = VPGAgent(env, policy_kwargs=policy_kwargs)
-
-# 训练
-episodes = 1000
-episode_rewards = []
-chart = Chart()
-for episode in range(episodes):
-    episode_reward = play_montecarlo(env, agent, train=True)
-    episode_rewards.append(episode_reward)
-    chart.plot(episode_rewards)
-
-plt.show()
-
-# 测试
-episode_rewards = [play_montecarlo(env, agent, train=False)
-        for _ in range(100)]
-print('平均回合奖励 = {} / {} = {}'.format(sum(episode_rewards),
-        len(episode_rewards), np.mean(episode_rewards)))
-
-# 带基线的简单策略梯度算法
-print('简单策略梯度算法（带基线）')
-policy_kwargs = {'hidden_sizes': [], 'learning_rate': 0.005}
-baseline_kwargs = {'hidden_sizes': [], 'learning_rate': 0.01}
-agent = VPGAgent(env, policy_kwargs=policy_kwargs,
-                 baseline_kwargs=baseline_kwargs)
-
-# 训练
-episodes = 1000
-episode_rewards = []
-chart = Chart()
-for episode in range(episodes):
-    episode_reward = play_montecarlo(env, agent, train=True)
-    episode_rewards.append(episode_reward)
-    chart.plot(episode_rewards)
-
-plt.show()
-
-# 测试
-episode_rewards = [play_montecarlo(env, agent, train=False) \
-                   for _ in range(100)]
-print('平均回合奖励 = {} / {} = {}'.format(sum(episode_rewards),
-        len(episode_rewards), np.mean(episode_rewards)))
+# # 不带基线的简单策略梯度算法
+# print('简单策略梯度算法')
+# policy_kwargs = {'hidden_sizes': [], 'learning_rate': 0.005}
+# agent = VPGAgent(env, policy_kwargs=policy_kwargs)
+#
+# # 训练
+# episodes = 1000
+# episode_rewards = []
+# chart = Chart()
+# for episode in range(episodes):
+#     episode_reward = play_montecarlo(env, agent, train=True)
+#     episode_rewards.append(episode_reward)
+#     chart.plot(episode_rewards)
+#
+# plt.show()
+#
+# # 测试
+# episode_rewards = [play_montecarlo(env, agent, train=False)
+#         for _ in range(100)]
+# print('平均回合奖励 = {} / {} = {}'.format(sum(episode_rewards),
+#         len(episode_rewards), np.mean(episode_rewards)))
+#
+# # 带基线的简单策略梯度算法
+# print('简单策略梯度算法（带基线）')
+# policy_kwargs = {'hidden_sizes': [], 'learning_rate': 0.005}
+# baseline_kwargs = {'hidden_sizes': [], 'learning_rate': 0.01}
+# agent = VPGAgent(env, policy_kwargs=policy_kwargs,
+#                  baseline_kwargs=baseline_kwargs)
+#
+# # 训练
+# episodes = 1000
+# episode_rewards = []
+# chart = Chart()
+# for episode in range(episodes):
+#     episode_reward = play_montecarlo(env, agent, train=True)
+#     episode_rewards.append(episode_reward)
+#     chart.plot(episode_rewards)
+#
+# plt.show()
+#
+# # 测试
+# episode_rewards = [play_montecarlo(env, agent, train=False) \
+#                    for _ in range(100)]
+# print('平均回合奖励 = {} / {} = {}'.format(sum(episode_rewards),
+#         len(episode_rewards), np.mean(episode_rewards)))
 
 # 异策策略梯度算法
 print("异策策略梯度算法")
 class RandomAgent:
-    def __init__(self):
-        self.action.n = env.action_space.n
+    def __init__(self, env):
+        self.action_n = env.action_space.n
 
     def decide(self, observation):
         action = np.random.choice(self.action_n)
-        behavior = 1. / self.acton_n
+        behavior = 1. / self.action_n
         return action, behavior
 
 class OffPolicyVPGAgent(VPGAgent):
